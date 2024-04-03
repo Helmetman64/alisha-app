@@ -30,6 +30,7 @@ INSERT INTO ITEMS
 VALUES
     ('Duck', 20.00, 100, 'duck'),
     ('Flower', 15.00, 20, 'flower'),
+    -- ('Free Flower', 0, 20, 'flower'),
     ('Small bag', 15.00, 10, 'smallBag'),
     ('Duck blind bag', 1.00, 10, 'duckBag'),
     ('Miffy keychain', 15.00, 15, 'miffyKeychain'),

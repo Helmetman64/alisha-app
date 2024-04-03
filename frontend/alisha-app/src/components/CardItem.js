@@ -45,10 +45,6 @@ export default function CardItem({ itemName, imageName, variant, itemPrice }) {
       if (quantity % 2 !== 0) {
         calculatedPrice += 20; // Add $20 for the remaining duck if not an even number
       }
-    } else if (itemName === "Flower") {
-      // Special deal for flowers: buy 2, get 1 free
-      const setsOfThree = Math.floor(quantity / 3); // Calculate sets of 3 flowers
-      calculatedPrice = (quantity - setsOfThree) * itemPrice; // Subtract the price of the free flowers
     } else {
       calculatedPrice = quantity * itemPrice;
     }
