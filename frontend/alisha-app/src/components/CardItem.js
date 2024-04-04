@@ -3,14 +3,22 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import IMAGES from "../assets/images.js";
+import { updateStockQuantity, recordSale } from "../services/service.js";
 
-export default function CardItem({ itemName, imageName, variant, itemPrice }) {
+export default function CardItem({
+  itemID,
+  itemName,
+  imageName,
+  itemPrice,
+  itemQTY,
+  showControls,
+  displayPrice,
+}) {
   const [showModal, setShowModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [errorModal, setErrorModal] = useState(false);
 
-  // Function to handle the sell button click
   const handleSell = () => {
     if (quantity <= 0) {
       setErrorModal(true);
@@ -24,9 +32,33 @@ export default function CardItem({ itemName, imageName, variant, itemPrice }) {
     setShowModal(false);
   };
 
-  const handleConfirmSell = () => {
-    // Perform the sell operation here
-    setShowModal(false);
+  const handleConfirmSell = async () => {
+    try {
+      // Calculate the new quantity after selling
+      const newQuantity = itemQTY - quantity;
+
+      // Perform the API request to update the database
+      await updateStockQuantity(itemID, newQuantity);
+
+      // Format the sale date
+      const saleDate = new Date().toISOString();
+
+      // Perform the API request to add a sale record
+      const saleData = {
+        itemID: itemID,
+        itemName: itemName,
+        salePrice: totalPrice,
+        qtySold: quantity,
+        saleDate: saleDate,
+      };
+      await recordSale(saleData);
+
+      // Close the modal
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error selling item:", error);
+      // Handle error (e.g., show error message to the user)
+    }
   };
 
   const handleQuantityChange = (event) => {
@@ -54,10 +86,9 @@ export default function CardItem({ itemName, imageName, variant, itemPrice }) {
 
   return (
     <>
-      {/* Card component to display items */}
-      <Card border={variant} style={{ width: "10rem" }}>
+      <Card border="primary" style={{ width: "18rem" }}>
         <Card.Header>
-          {itemName} ${itemPrice}
+          {itemName} {displayPrice ? `$${itemPrice}` : `- Quantity: ${itemQTY}`}
         </Card.Header>
         <Card.Img
           variant="top"
@@ -65,10 +96,18 @@ export default function CardItem({ itemName, imageName, variant, itemPrice }) {
           alt={imageName}
           style={{ width: "100%" }}
         />
-        <Button variant="danger" onClick={handleSell}>
-          Sell
-        </Button>
-        <input type="number" value={quantity} onChange={handleQuantityChange} />
+        {showControls && (
+          <>
+            <Button variant="danger" onClick={handleSell}>
+              Sell
+            </Button>
+            <input
+              type="number"
+              value={quantity}
+              onChange={handleQuantityChange}
+            />
+          </>
+        )}
       </Card>
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>

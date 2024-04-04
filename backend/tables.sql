@@ -1,40 +1,113 @@
 USE ALISHA;
 
-IF OBJECT_ID('ITEMS') IS NOT NULL
-DROP TABLE ITEMS;
+IF OBJECT_ID('Sales') IS NOT NULL
+DROP TABLE Sales;
 
-CREATE TABLE ITEMS
+
+IF OBJECT_ID('Items') IS NOT NULL
+DROP TABLE Items;
+
+CREATE TABLE Items
 (
+    itemID INT IDENTITY(1,1),
     itemName NVARCHAR(100),
     itemPrice MONEY,
     itemQTY INT,
     imageName NVARCHAR(100),
-    PRIMARY KEY (itemName)
+    PRIMARY KEY (itemID)
 );
 
-IF OBJECT_ID('HISTORY') IS NOT NULL
-DROP TABLE HISTORY;
 
--- CREATE TABLE HISTORY
--- (
---     historyID BIGINT,
---     itemID INT,
---     itemQTY INT,
---     itemPrice MONEY,
---     saleDate DATE,
---     PRIMARY KEY (historyID),
---     FOREIGN KEY (itemID) REFERENCES ITEMS
--- );
+CREATE TABLE Sales
+(
+    saleID INT IDENTITY(1,1) PRIMARY KEY,
+    itemID INT NOT NULL,
+    itemName NVARCHAR(100),
+    salePrice MONEY NOT NULL,
+    qtySold INT NOT NULL,
+    saleDate DATE NOT NULL,
+    FOREIGN KEY (itemID) REFERENCES Items(itemID)
+);
 
-INSERT INTO ITEMS
+------------------------------------- PROCEDURES -------------------------------------------------------------
+-- PROCEDURE TO UPDATE THE ITEMS TABLE FOR WHEN AN ITEM IS SOLD
+IF OBJECT_ID('UpdateStockQuantity') IS NOT NULL
+DROP PROCEDURE UpdateStockQuantity;
+GO
+
+CREATE PROCEDURE UpdateStockQuantity
+    @itemID INT,
+    @newQuantity INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check if the item exists
+    IF NOT EXISTS (SELECT 1
+    FROM Items
+    WHERE itemID = @itemID)
+    BEGIN
+        RAISERROR
+    ('Item not found', 16, 1);
+        RETURN;
+    END
+
+    -- Update the stock quantity
+    UPDATE Items
+    SET itemQTY = @newQuantity
+    WHERE itemID = @itemID;
+
+    -- Optionally, you can return information about the updated stock
+    SELECT itemID, itemQTY
+    FROM Items
+    WHERE itemID = @itemID;
+END;
+GO
+
+-- PROCEDURE TO INSERT A SALE INTO THE SALES TABLE
+IF OBJECT_ID('RecordSale') IS NOT NULL
+    DROP PROCEDURE RecordSale;
+GO
+
+CREATE PROCEDURE RecordSale
+    @itemID INT,
+    @itemName NVARCHAR(100),
+    @salePrice MONEY,
+    @qtySold INT,
+    @saleDate DATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Insert the sale into the Sales table
+    INSERT INTO Sales
+        (itemID, itemName, salePrice, qtySold, saleDate)
+    VALUES
+        (@itemID, @itemName, @salePrice, @qtySold, @saleDate);
+END;
+GO
+-------------------------------------- TEST DATA -------------------------------------------------------------
+INSERT INTO Items
 VALUES
-    ('Duck', 20.00, 100, 'duck'),
-    ('Flower', 15.00, 20, 'flower'),
+    ( 'Duck', 20.00, 100, 'duck'),
+    ( 'Flower', 15.00, 20, 'flower'),
     -- ('Free Flower', 0, 20, 'flower'),
-    ('Small bag', 15.00, 10, 'smallBag'),
-    ('Duck blind bag', 1.00, 10, 'duckBag'),
-    ('Miffy keychain', 15.00, 15, 'miffyKeychain'),
-    ('Miffy plush', 35.00, 15, 'miffyPlush');
+    ( 'Small bag', 15.00, 10, 'smallBag'),
+    ( 'Duck blind bag', 1.00, 10, 'duckBag'),
+    ( 'Miffy keychain', 15.00, 15, 'miffyKeychain'),
+    ( 'Miffy plush', 35.00, 15, 'miffyPlush');
+
+INSERT INTO Sales
+VALUES
+    (1, 'Duck', 20.00, 1, '2021-01-01'),
+    (2, 'Flower', 15.00, 1, '2021-01-01'),
+    (3, 'Small bag', 15.00, 1, '2021-01-01'),
+    (4, 'Duck blind bag', 1.00, 1, '2021-01-01'),
+    (5, 'Miffy keychain', 15.00, 1, '2021-01-01'),
+    (6, 'Miffy plush', 35.00, 1, '2021-01-01');
 
 SELECT *
-FROM ITEMS
+FROM Items
+
+SELECT *
+FROM Sales 

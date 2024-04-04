@@ -23,9 +23,13 @@ export default function Home() {
     <div className="body">
       {items.map((item) => (
         <CardItem
+          itemID={item.itemID}
           itemName={item.itemName}
           itemPrice={item.itemPrice}
+          itemQTY={item.itemQTY}
+          displayPrice={true}
           imageName={item.imageName} // Pass the imageName field from the item object
+          showControls={true}
         />
       ))}
     </div>
