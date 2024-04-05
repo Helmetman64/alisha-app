@@ -58,6 +58,54 @@ export default function Home() {
     try {
       console.log("Items to sell:", itemsToSell);
 
+      let totalSalePrice = 0; // Initialize total sale price
+
+      // Record the sale in the database
+      const currentDate = new Date();
+      const formattedSaleDate = `${currentDate
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${currentDate
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")} ${currentDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}-${(currentDate.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${currentDate.getFullYear()}`;
+
+      await Promise.all(
+        itemsToSell.map(async (item) => {
+          let itemSalePrice = 0; // Initialize sale price for this item
+          if (item.itemName !== "Duck") {
+            // Exclude special pricing for ducks
+            itemSalePrice = item.itemPrice * clickCounts[item.itemID]; // Calculate sale price for this item
+          } else {
+            // Handle special pricing for ducks separately
+            const quantity = clickCounts[item.itemID] || 0;
+            const setsOfTwo = Math.floor(quantity / 2); // Calculate sets of 2 ducks
+            itemSalePrice = setsOfTwo * 35; // $35 for each set of 2 ducks
+            if (quantity % 2 !== 0) {
+              itemSalePrice += 20; // Add $20 for the remaining duck if not an even number
+            }
+          }
+
+          // Record sale for this item
+          const saleData = {
+            itemID: item.itemID,
+            itemName: item.itemName,
+            salePrice: itemSalePrice,
+            qtySold: clickCounts[item.itemID],
+            saleDate: formattedSaleDate,
+          };
+          await recordSale(saleData);
+
+          // Add sale price of this item to total sale price
+          totalSalePrice += itemSalePrice;
+        })
+      );
+
       // Update stock quantity in the database
       await Promise.all(
         itemsToSell.map(async (item) => {
@@ -66,24 +114,10 @@ export default function Home() {
         })
       );
 
-      // Record the sale in the database
-      const saleDate = new Date().toISOString();
-      await Promise.all(
-        itemsToSell.map(async (item) => {
-          const saleData = {
-            itemID: item.itemID,
-            itemName: item.itemName,
-            salePrice: item.itemPrice * clickCounts[item.itemID],
-            qtySold: clickCounts[item.itemID],
-            saleDate: saleDate,
-          };
-          await recordSale(saleData);
-        })
-      );
-
       setShowModal(false);
       setShowConfirmationModal(true); // Show confirmation modal
       setSelectedItem(null);
+      setTotalPrice(totalSalePrice); // Set total sale price
     } catch (error) {
       console.error("Error selling items:", error);
       // Handle error (e.g., show error message to the user)

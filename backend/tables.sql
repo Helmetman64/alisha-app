@@ -25,7 +25,7 @@ CREATE TABLE Sales
     itemName NVARCHAR(100),
     salePrice INT NOT NULL,
     qtySold INT NOT NULL,
-    saleDate DATE NOT NULL,
+    saleDate NVARCHAR(100) NOT NULL,
     FOREIGN KEY (itemID) REFERENCES Items(itemID)
 );
 
@@ -97,7 +97,7 @@ CREATE PROCEDURE RecordSale
     @itemName NVARCHAR(100),
     @salePrice INT,
     @qtySold INT,
-    @saleDate DATE
+    @saleDate NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -120,17 +120,17 @@ VALUES
     ( 'Miffy keychain', 15.00, 15, 'miffyKeychain'),
     ( 'Miffy plush', 35.00, 15, 'miffyPlush');
 
-INSERT INTO Sales
-VALUES
-    (1, 'Duck', 20.00, 1, '2021-01-01'),
-    (2, 'Flower', 15.00, 1, '2021-01-01'),
-    (3, 'Small bag', 15.00, 1, '2021-01-01'),
-    (4, 'Duck blind bag', 1.00, 1, '2021-01-01'),
-    (5, 'Miffy keychain', 15.00, 1, '2021-01-01'),
-    (6, 'Miffy plush', 35.00, 1, '2021-01-01');
+-- INSERT INTO Sales
+-- VALUES
+--     (1, 'Duck', 20.00, 1, '2021-01-01'),
+--     (2, 'Flower', 15.00, 1, '2021-01-01'),
+--     (3, 'Small bag', 15.00, 1, '2021-01-01'),
+--     (4, 'Duck blind bag', 1.00, 1, '2021-01-01'),
+--     (5, 'Miffy keychain', 15.00, 1, '2021-01-01'),
+--     (6, 'Miffy plush', 35.00, 1, '2021-01-01');
 
-SELECT *
-FROM Items
+-- SELECT *
+-- FROM Items
 
-SELECT *
-FROM Sales 
+-- SELECT *
+-- FROM Sales 

@@ -1,27 +1,23 @@
-// Import required modules
+require("dotenv").config(); // Load environment variables from .env file
 const express = require("express");
 const sql = require("mssql");
 const cors = require("cors");
 
-// Create an instance of express
 const app = express();
 
-// Database configuration
 const dbConfig = {
-  user: "admin",
-  password: "AlishaDB",
-  server: "database-1.cz84m4ky8zu0.ap-southeast-2.rds.amazonaws.com", // Change this to your AWS SQL Server endpoint
-  database: "ALISHA",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  server: process.env.DB_SERVER,
+  database: process.env.DB_NAME,
   options: {
     trustServerCertificate: true,
   },
 };
 
-// Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cors());
 
-// Connect to the database
 sql.connect(dbConfig, (err) => {
   if (err) {
     console.error("Error connecting to the database:", err);
@@ -30,28 +26,22 @@ sql.connect(dbConfig, (err) => {
   console.log("Connected to MSSQL database.");
 });
 
-// Get all items
 app.get("/items", (req, res) => {
-  // Query to retrieve items from the database
   const query = "SELECT * FROM Items";
 
-  // Execute the query
   sql.query(query, (err, result) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).send("Error retrieving items from database.");
       return;
     }
-    // Send the result as JSON
     res.json(result.recordset);
   });
 });
 
-// Add a new item
 app.post("/items", (req, res) => {
   const { itemName, itemPrice, itemQTY, imageName } = req.body;
 
-  // Call the stored procedure to record the sale
   const query = `EXEC AddItem @itemName = @itemName, @itemPrice = @itemPrice, @itemQTY = @itemQTY, @imageName = @imageName`;
 
   const request = new sql.Request();
@@ -70,12 +60,10 @@ app.post("/items", (req, res) => {
   });
 });
 
-// Update stock quantity for a specific item
 app.put("/items/:itemID", (req, res) => {
   const { itemID } = req.params;
   const { newQuantity } = req.body;
 
-  // Call the stored procedure to update the stock quantity
   const request = new sql.Request();
   request.input("itemID", sql.Int, itemID);
   request.input("newQuantity", sql.Int, newQuantity);
@@ -90,28 +78,22 @@ app.put("/items/:itemID", (req, res) => {
   });
 });
 
-// Get all sales records
 app.get("/sales", (req, res) => {
-  // Query to retrieve items from the database
   const query = "SELECT * FROM Sales";
 
-  // Execute the query
   sql.query(query, (err, result) => {
     if (err) {
       console.error("Error executing query:", err);
       res.status(500).send("Error retrieving items from database.");
       return;
     }
-    // Send the result as JSON
     res.json(result.recordset);
   });
 });
 
-// POST endpoint to record a sale
 app.post("/sales", (req, res) => {
   const { itemID, itemName, salePrice, qtySold, saleDate } = req.body;
 
-  // Call the stored procedure to record the sale
   const query = `EXEC RecordSale @itemID = @itemID, @itemName = @itemName, @salePrice = @salePrice, @qtySold = @qtySold, @saleDate = @saleDate`;
 
   const request = new sql.Request();
@@ -119,7 +101,7 @@ app.post("/sales", (req, res) => {
   request.input("itemName", sql.NVarChar(100), itemName);
   request.input("salePrice", sql.Int, salePrice);
   request.input("qtySold", sql.Int, qtySold);
-  request.input("saleDate", sql.Date, saleDate);
+  request.input("saleDate", sql.NVarChar(100), saleDate);
 
   request.execute("RecordSale", (err, result) => {
     if (err) {
@@ -131,7 +113,6 @@ app.post("/sales", (req, res) => {
   });
 });
 
-// Start the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
