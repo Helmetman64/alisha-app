@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Modal } from "react-bootstrap";
+import { Card, Button, Modal, Row, Col } from "react-bootstrap";
 import IMAGES from "../assets/images.js";
 import {
   updateStockQuantity,
@@ -197,93 +197,70 @@ export default function Home() {
 
   return (
     <div className="body">
-      <div>
-        <h2>Total Price: ${totalPrice}</h2>
-      </div>
-      <div>
-        <h2>Items to Sell:</h2>
-        <ul>
-          {itemsToSell.map((item) => (
-            <li key={item.itemID}>
-              {item.itemName} - Quantity: {clickCounts[item.itemID]}
-            </li>
-          ))}
-        </ul>
-      </div>
-      {items.map((item) => (
-        <Card
-          key={item.itemID}
-          border="primary"
-          style={{ width: "18rem", cursor: "pointer" }}
-          onClick={() => handleCardClick(item)}
-        >
-          <Card.Header>
-            {item.itemName} ${item.itemPrice}
-          </Card.Header>
-          <Card.Img
-            variant="top"
-            src={IMAGES[item.imageName]}
-            alt={item.imageName}
-            style={{ width: "100%" }}
-          />
-        </Card>
-      ))}
-      {itemsToSell.length > 0 && (
-        <Button variant="danger" onClick={handleSell}>
-          Sell
-        </Button>
-      )}
-
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Sell</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {itemsToSell.map((item, index) => (
-            <div key={index}>
-              <span>
-                {item.itemName} - Quantity: {clickCounts[item.itemID]}
-              </span>
-              <Button
-                variant="outline-danger"
-                onClick={() => handleQuantityDecrement(item.itemID)}
-              >
-                -
+      <Row>
+        <Col xs={12} md={8}>
+          <Row>
+            {items.map((item) => (
+              <Col key={item.itemID} xs={12} sm={6} md={6} lg={4} xl={3}>
+                <Card
+                  key={item.itemID}
+                  border="primary"
+                  className="mb-3"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleCardClick(item)}
+                >
+                  <Card.Header>
+                    {item.itemName} ${item.itemPrice}
+                  </Card.Header>
+                  <Card.Img
+                    variant="top"
+                    src={IMAGES[item.imageName]}
+                    alt={item.imageName}
+                    className="duck"
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Col>
+        <Col xs={12} md={4}>
+          <div className="side-container">
+            {/* Only display total price and items to sell here */}
+            <h2>Total Price: ${totalPrice}</h2>
+            <h2>Items to Sell:</h2>
+            <ul>
+              {itemsToSell.map((item) => (
+                <li key={item.itemID}>
+                  {item.itemName} - Quantity: {clickCounts[item.itemID]}
+                </li>
+              ))}
+            </ul>
+            {itemsToSell.length > 0 && (
+              <Button variant="danger" onClick={handleSell} className="mt-3">
+                Sell
               </Button>
-            </div>
-          ))}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleConfirmSell}>
-            Sell
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Sell</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {itemsToSell.map((item, index) => (
-            <div key={index}>
-              <span>
-                {item.itemName} - Quantity: {clickCounts[item.itemID]}
-              </span>
-              <Button
-                variant="outline-danger"
-                onClick={() => handleQuantityDecrement(item.itemID)}
-              >
-                -
-              </Button>
-            </div>
-          ))}
-          <div>
-            <h4>Total Price: ${totalPrice}</h4>
+            )}
           </div>
+        </Col>
+      </Row>
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Sell</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {itemsToSell.map((item, index) => (
+            <div key={index}>
+              <span>
+                {item.itemName} - Quantity: {clickCounts[item.itemID]}
+              </span>
+              <Button
+                variant="outline-danger"
+                onClick={() => handleQuantityDecrement(item.itemID)}
+              >
+                -
+              </Button>
+            </div>
+          ))}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
@@ -294,7 +271,6 @@ export default function Home() {
           </Button>
         </Modal.Footer>
       </Modal>
-
       <Modal show={showConfirmationModal} onHide={handleConfirmationModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>Sold!</Modal.Title>

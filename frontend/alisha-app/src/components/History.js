@@ -16,6 +16,7 @@ export default function History() {
       console.error("Error fetching items:", error);
     }
   };
+  // Function to format the date in the format HH:MM DD/MM/YYYY
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

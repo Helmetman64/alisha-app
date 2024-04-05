@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  "http://ec2-3-27-240-184.ap-southeast-2.compute.amazonaws.com:3000"; // Replace this with your API base URL
+const API_BASE_URL = "http://localhost:3000"; // Replace this with your API base URL
 
 // Fetch all items from the API
 export async function fetchItems() {

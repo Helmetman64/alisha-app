@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchItems, addItem } from "../services/service";
 import CardItem from "./CardItem";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal, Row, Col } from "react-bootstrap";
 
 export default function Stock() {
   const [items, setItems] = useState([]);
@@ -109,7 +109,11 @@ export default function Stock() {
         ))}
       </div>
       <Button onClick={handleAddStock}>Add Stock</Button>
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal
+        show={showModal}
+        onHide={handleCloseModal}
+        dialogClassName="modal-dialog-centered"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Add Stock</Modal.Title>
         </Modal.Header>

@@ -10,15 +10,15 @@ export default function CardItem({
   displayPrice,
 }) {
   return (
-    <Card border="primary" style={{ width: "18rem" }}>
-      <Card.Header>
+    <Card className="card">
+      <Card.Header className="card-header">
         {itemName} {displayPrice ? `$${itemPrice}` : `- Quantity: ${itemQTY}`}
       </Card.Header>
       <Card.Img
         variant="top"
         src={IMAGES[imageName]}
         alt={imageName}
-        style={{ width: "100%" }}
+        className="card-img-top"
       />
     </Card>
   );
