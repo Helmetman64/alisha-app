@@ -9,6 +9,28 @@ export async function fetchItems() {
   return response.json();
 }
 
+// Add a new item to the stock
+export async function addItem(itemData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/items`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(itemData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add item to stock");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error adding stock:", error.message);
+    throw error;
+  }
+}
+
 // Updates the quantity of a specific item in the stock
 export async function updateStockQuantity(itemID, newQuantity) {
   const response = await fetch(`${API_BASE_URL}/items/${itemID}`, {

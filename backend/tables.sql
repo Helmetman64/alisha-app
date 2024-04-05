@@ -11,7 +11,7 @@ CREATE TABLE Items
 (
     itemID INT IDENTITY(1,1),
     itemName NVARCHAR(100),
-    itemPrice MONEY,
+    itemPrice INT,
     itemQTY INT,
     imageName NVARCHAR(100),
     PRIMARY KEY (itemID)
@@ -23,13 +23,36 @@ CREATE TABLE Sales
     saleID INT IDENTITY(1,1) PRIMARY KEY,
     itemID INT NOT NULL,
     itemName NVARCHAR(100),
-    salePrice MONEY NOT NULL,
+    salePrice INT NOT NULL,
     qtySold INT NOT NULL,
     saleDate DATE NOT NULL,
     FOREIGN KEY (itemID) REFERENCES Items(itemID)
 );
 
 ------------------------------------- PROCEDURES -------------------------------------------------------------
+-- PROCEDURE TO INSERT AN ITEM INTO THE ITEMS TABLE
+
+IF OBJECT_ID('AddItem') IS NOT NULL
+DROP PROCEDURE AddItem;
+GO
+
+CREATE PROCEDURE AddItem
+    @itemName NVARCHAR(100),
+    @itemPrice INT,
+    @itemQTY INT,
+    @imageName NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Insert the item into the Items table
+    INSERT INTO Items
+        (itemName, itemPrice, itemQTY, imageName)
+    VALUES
+        (@itemName, @itemPrice, @itemQTY, @imageName);
+END;
+GO
+
 -- PROCEDURE TO UPDATE THE ITEMS TABLE FOR WHEN AN ITEM IS SOLD
 IF OBJECT_ID('UpdateStockQuantity') IS NOT NULL
 DROP PROCEDURE UpdateStockQuantity;
@@ -72,7 +95,7 @@ GO
 CREATE PROCEDURE RecordSale
     @itemID INT,
     @itemName NVARCHAR(100),
-    @salePrice MONEY,
+    @salePrice INT,
     @qtySold INT,
     @saleDate DATE
 AS

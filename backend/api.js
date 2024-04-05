@@ -30,8 +30,6 @@ sql.connect(dbConfig, (err) => {
   console.log("Connected to MSSQL database.");
 });
 
-// Define your API routes
-
 // Get all items
 app.get("/items", (req, res) => {
   // Query to retrieve items from the database
@@ -51,17 +49,24 @@ app.get("/items", (req, res) => {
 
 // Add a new item
 app.post("/items", (req, res) => {
-  const { itemID, itemName, itemPrice, itemQTY } = req.body;
+  const { itemName, itemPrice, itemQTY, imageName } = req.body;
 
-  const query = `INSERT INTO Items (itemID, itemName, itemPrice, itemQTY) VALUES ('${itemID}', '${itemName}', '${itemPrice}', '${itemQTY}')`;
+  // Call the stored procedure to record the sale
+  const query = `EXEC AddItem @itemName = @itemName, @itemPrice = @itemPrice, @itemQTY = @itemQTY, @imageName = @imageName`;
 
-  sql.query(query, (err, result) => {
+  const request = new sql.Request();
+  request.input("itemName", sql.NVarChar(100), itemName);
+  request.input("itemPrice", sql.Int, itemPrice);
+  request.input("itemQTY", sql.Int, itemQTY);
+  request.input("imageName", sql.NVarChar(100), imageName);
+
+  request.execute("AddItem", (err, result) => {
     if (err) {
       console.error("Error executing query:", err);
-      res.status(500).send("Error inserting item into database.");
+      res.status(500).send("Error adding item to items.");
       return;
     }
-    res.status(201).send("Item inserted successfully.");
+    res.status(201).json({ message: "Added item successfully." });
   });
 });
 
@@ -112,7 +117,7 @@ app.post("/sales", (req, res) => {
   const request = new sql.Request();
   request.input("itemID", sql.Int, itemID);
   request.input("itemName", sql.NVarChar(100), itemName);
-  request.input("salePrice", sql.Money, salePrice);
+  request.input("salePrice", sql.Int, salePrice);
   request.input("qtySold", sql.Int, qtySold);
   request.input("saleDate", sql.Date, saleDate);
 
