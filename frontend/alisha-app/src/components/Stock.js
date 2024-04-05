@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchItems, addItem } from "../services/service";
+import { fetchItems, addItem, updateStockQuantity } from "../services/service";
 import { Button, Form, Modal, Row, Col, Card } from "react-bootstrap";
 import IMAGES from "../assets/images";
 
@@ -7,15 +7,13 @@ export default function Stock() {
   const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [itemName, setItemName] = useState("");
+  const [selectedItem, setSelectedItem] = useState("");
   const [itemPrice, setItemPrice] = useState("");
   const [itemQTY, setItemQTY] = useState("");
-  const [imageName, setImageName] = useState("");
   const [errors, setErrors] = useState({
     itemName: "",
     itemPrice: "",
     itemQTY: "",
-    imageName: "",
   });
 
   useEffect(() => {
@@ -35,12 +33,24 @@ export default function Stock() {
     setShowModal(true);
   };
 
+  const handleSelectedItemChange = (e) => {
+    const selectedItem = e.target.value;
+    setSelectedItem(selectedItem);
+    const selectedItemData = items.find(
+      (item) => item.itemName === selectedItem
+    );
+    if (selectedItemData) {
+      setItemPrice(selectedItemData.itemPrice);
+      setItemQTY(selectedItemData.itemQTY);
+    }
+  };
+
   const validateForm = () => {
     let isValid = true;
     const newErrors = {};
 
-    if (!itemName) {
-      newErrors.itemName = "Item Name is required";
+    if (!selectedItem) {
+      newErrors.itemName = "Please select an item";
       isValid = false;
     }
 
@@ -59,11 +69,6 @@ export default function Stock() {
       isValid = false;
     }
 
-    if (!imageName) {
-      newErrors.imageName = "Image Name is required";
-      isValid = false;
-    }
-
     setErrors(newErrors);
     return isValid;
   };
@@ -73,13 +78,11 @@ export default function Stock() {
       return;
     }
 
-    const itemData = {
-      itemName: itemName,
-      itemPrice: itemPrice,
-      itemQTY: itemQTY,
-      imageName: imageName,
-    };
-    await addItem(itemData);
+    const selectedItemData = items.find(
+      (item) => item.itemName === selectedItem
+    );
+
+    await updateStockQuantity(selectedItemData.itemID, itemQTY);
     setShowModal(false);
     setShowConfirmationModal(true);
     // Refresh data after adding new item
@@ -103,7 +106,7 @@ export default function Stock() {
             <Col key={item.itemID} xs={12} sm={6} md={6} lg={4} xl={3}>
               <Card key={item.itemID} border="primary" className="mb-3">
                 <Card.Header>
-                  {item.itemName} - {item.itemQTY}
+                  {item.itemName} - Quantity {item.itemQTY}
                 </Card.Header>
                 <Card.Img
                   variant="top"
@@ -117,42 +120,29 @@ export default function Stock() {
         </Row>
       </div>
       <Button onClick={handleAddStock}>Add Stock</Button>
-      <Modal
-        show={showModal}
-        onHide={handleCloseModal}
-        dialogClassName="modal-dialog-centered"
-      >
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Add Stock</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group controlId="formItemName">
-              <Form.Label>Item Name</Form.Label>
+            <Form.Group controlId="formSelectedItem">
+              <Form.Label>Select Item</Form.Label>
               <Form.Control
-                type="text"
-                placeholder="Enter item name"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
+                as="select"
+                value={selectedItem}
+                onChange={handleSelectedItemChange}
                 className={errors.itemName ? "is-invalid" : ""}
-              />
+              >
+                <option value="">Select...</option>
+                {items.map((item) => (
+                  <option key={item.itemID} value={item.itemName}>
+                    {item.itemName}
+                  </option>
+                ))}
+              </Form.Control>
               {errors.itemName && (
                 <div className="invalid-feedback">{errors.itemName}</div>
-              )}
-            </Form.Group>
-            <Form.Group controlId="formItemPrice">
-              <Form.Label>Item Price</Form.Label>
-              <Form.Control
-                type="number"
-                min="0.01"
-                step="0.01"
-                placeholder="Enter item price"
-                value={itemPrice}
-                onChange={(e) => setItemPrice(e.target.value)}
-                className={errors.itemPrice ? "is-invalid" : ""}
-              />
-              {errors.itemPrice && (
-                <div className="invalid-feedback">{errors.itemPrice}</div>
               )}
             </Form.Group>
             <Form.Group controlId="formItemQTY">
@@ -167,19 +157,6 @@ export default function Stock() {
               />
               {errors.itemQTY && (
                 <div className="invalid-feedback">{errors.itemQTY}</div>
-              )}
-            </Form.Group>
-            <Form.Group controlId="formImageName">
-              <Form.Label>Image Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter image name"
-                value={imageName}
-                onChange={(e) => setImageName(e.target.value)}
-                className={errors.imageName ? "is-invalid" : ""}
-              />
-              {errors.imageName && (
-                <div className="invalid-feedback">{errors.imageName}</div>
               )}
             </Form.Group>
           </Form>
@@ -198,7 +175,7 @@ export default function Stock() {
           <Modal.Title>Item Added</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>The item has been successfully added to the stock.</p>
+          <p>The item has been successfully updated.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleCloseConfirmationModal}>
