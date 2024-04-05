@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000"; // Replace this with your API base URL
+const API_BASE_URL = "https://alisha-backend.onrender.com"; // Replace this with your API base URL
 
 // Fetch all items from the API
 export async function fetchItems() {

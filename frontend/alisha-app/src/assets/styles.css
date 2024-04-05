@@ -9,7 +9,9 @@ body  {
 
 .body {
     display: flex;
-    padding: 100px;
+    justify-content: start;
+    flex-wrap: wrap;
+    margin: 0;
 }
 
 .logo {
@@ -56,14 +58,32 @@ body  {
 }
 
 .card {
-    width: 100%;
+    box-sizing: border-box;
+    max-width: 50%;
+    margin: 0;
 }
 
 .card-header {
     height: 50px; /* Adjust as needed */
 }
 
-.card-img-top {
-    height: 200px; /* Adjust as needed */
+.card-img{
+    height: 300px; /* Adjust as needed */
     object-fit: cover;
+}
+
+@media screen and (min-width: 768px) {
+    .card {
+        max-width: 100%;
+    }
+    
+    .card-header {
+        height: 50px; /* Adjust as needed */
+    }
+    
+    .card-img{
+        height: 300px; /* Adjust as needed */
+        object-fit: cover;
+    }
+    
 }

@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { fetchItems, addItem, updateStockQuantity } from "../services/service";
-import { Button, Form, Modal, Row, Col, Card } from "react-bootstrap";
+import {
+  Button,
+  Form,
+  Modal,
+  Row,
+  Col,
+  Card,
+  Container,
+} from "react-bootstrap";
 import IMAGES from "../assets/images";
 
 export default function Stock() {
@@ -98,15 +106,15 @@ export default function Stock() {
   };
 
   return (
-    <>
+    <Container fluid>
+      <h1>Stock</h1>
       <div className="body">
-        <h1>Stock</h1>
         <Row>
           {items.map((item) => (
             <Col key={item.itemID} xs={12} sm={6} md={6} lg={4} xl={3}>
               <Card key={item.itemID} border="primary" className="mb-3">
                 <Card.Header>
-                  {item.itemName} - Quantity {item.itemQTY}
+                  {item.itemName} - Quantity {item.itemQTY}{" "}
                 </Card.Header>
                 <Card.Img
                   variant="top"
@@ -183,6 +191,6 @@ export default function Stock() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </Container>
   );
 }

@@ -198,31 +198,29 @@ export default function Home() {
   return (
     <div className="body">
       <Row>
-        <Col xs={12} md={8}>
-          <Row>
-            {items.map((item) => (
-              <Col key={item.itemID} xs={12} sm={6} md={6} lg={4} xl={3}>
-                <Card
-                  key={item.itemID}
-                  border="primary"
-                  className="mb-3"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleCardClick(item)}
-                >
-                  <Card.Header>
-                    {item.itemName} ${item.itemPrice}
-                  </Card.Header>
-                  <Card.Img
-                    variant="top"
-                    src={IMAGES[item.imageName]}
-                    alt={item.imageName}
-                    className="duck"
-                  />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Col>
+        <Row>
+          {items.map((item) => (
+            <Col key={item.itemID} xs={12} sm={6} md={6} lg={4} xl={3}>
+              <Card
+                key={item.itemID}
+                border="primary"
+                className="mb-3"
+                style={{ cursor: "pointer" }}
+                onClick={() => handleCardClick(item)}
+              >
+                <Card.Header>
+                  {item.itemName} ${item.itemPrice}
+                </Card.Header>
+                <Card.Img
+                  variant="top"
+                  src={IMAGES[item.imageName]}
+                  alt={item.imageName}
+                  className="duck"
+                />
+              </Card>
+            </Col>
+          ))}
+        </Row>
         <Col xs={12} md={4}>
           <div className="side-container">
             {/* Only display total price and items to sell here */}
