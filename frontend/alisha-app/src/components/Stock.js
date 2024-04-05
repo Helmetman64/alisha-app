@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchItems, addItem } from "../services/service";
-import CardItem from "./CardItem";
-import { Button, Form, Modal, Row, Col } from "react-bootstrap";
+import { Button, Form, Modal, Row, Col, Card } from "react-bootstrap";
+import IMAGES from "../assets/images";
 
 export default function Stock() {
   const [items, setItems] = useState([]);
@@ -98,15 +98,23 @@ export default function Stock() {
     <>
       <div className="body">
         <h1>Stock</h1>
-        {items.map((item) => (
-          <CardItem
-            key={item.itemId}
-            itemName={item.itemName}
-            itemPrice={item.itemPrice}
-            imageName={item.imageName}
-            itemQTY={item.itemQTY}
-          />
-        ))}
+        <Row>
+          {items.map((item) => (
+            <Col key={item.itemID} xs={12} sm={6} md={6} lg={4} xl={3}>
+              <Card key={item.itemID} border="primary" className="mb-3">
+                <Card.Header>
+                  {item.itemName} - {item.itemQTY}
+                </Card.Header>
+                <Card.Img
+                  variant="top"
+                  src={IMAGES[item.imageName]}
+                  alt={item.imageName}
+                  className="duck"
+                />
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </div>
       <Button onClick={handleAddStock}>Add Stock</Button>
       <Modal
